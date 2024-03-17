@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use App\Models\Room;
 /**
  * @method static create(array $array)
  */
@@ -47,10 +47,13 @@ class User extends Authenticatable
     ];
 
 
-    public function rooms(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public function myRooms()
     {
-        return $this->morphedByMany(Room::class, 'roomAble');
+        return $this->hasMany(Room::class, 'owner_id', 'id');
     }
-
+    public function rooms(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Room::class,'room_user','user_id','room_id');
+    }
 
 }

@@ -24,8 +24,11 @@ Route::group(['prefix' => 'chat-room'], function () {
     Route::get('/', [RoomController::class, 'index'])->name('room.index');
     Route::post('/create-room', [RoomController::class, 'storeRoom'])->name('room.store');
     Route::post('/search/', [RoomController::class, 'search'])->name('room.search');
+    //Route::post('/sendmess', [RoomController::class, 'sendmess'])->name('sendmess');
+    Route::post('/join', [RoomController::class, 'join'])->name('room.join');
 });
 
+Route::get('/info',[RoomController::class, 'roomInfo'])->name('room.info');
 
 
 

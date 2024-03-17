@@ -26,22 +26,7 @@
                 <div class="w-full pb-6 px-8">
                     <p class="font-semibold">Rooms</p>
                     <div class="w-full" id="search_room_result">
-                        @foreach($rooms as $room)
-                            <a href="#" class="w-full bg-[#262948] hover:bg-[#4289f3] py-3 px-4 my-4 rounded-lg flex justify-between items-center gap-2">
-                                <div class="flex justify-start items-center gap-4">
-                                    <div class="w-8 h-8 rounded-full">
-                                        <img src="{{asset($room->icon ?? 'images/avatar.jpg')}}" alt="avatar" class="w-full h-full rounded-full border-2 border-red-500" />
-                                    </div>
-                                    <p class="font-bold text-white">{{$room->name}}</p>
-                                </div>
 
-                                <div class="">
-                                    <button class="text-white hover:text-orange-500 text-xl">
-                                        <i class="fa-solid fa-right-to-bracket"></i>
-                                    </button>
-                                </div>
-                            </a>
-                        @endforeach
                     </div>
                 </div>
             </div>
@@ -81,7 +66,7 @@
                                 </div>
 
                                 <div class="">
-                                    <button class="text-white hover:text-orange-500 text-xl">
+                                    <button class="text-white hover:text-orange-500 text-xl" onclick="sendJoinRoomRequest('${rooms[i].id}')">
                                         <i class="fa-solid fa-right-to-bracket"></i>
                                     </button>
                                 </div>
@@ -103,4 +88,47 @@
         });
 
     });
+
+    function sendJoinRoomRequest(room_id){
+        console.log(room_id)
+        $.ajax({
+            type: 'POST',
+            url: '{{ route("room.join") }}',
+            data: {
+                _token: '{{ csrf_token() }}',
+                room_id: room_id
+            },
+            success: function(response) {
+                // Turn on notification
+                turnOnNotification(response.message, "success");
+                // Push room to joined rooms list
+                const room = response.room;
+                if (!room) return
+                const html =
+                    `<a href="#" class="w-full bg-[#262948] hover:bg-[#4289f3] py-3 px-4 my-4 rounded-lg grid grid-cols-3 gap-2 relative">
+                            <div class="col-span-1">
+                                <div class="flex justify-start items-center gap-4">
+                                    <div class="w-8 h-8 rounded-full">
+                                    <img src="${room.icon ?? 'images/avatar.jpg'}" alt="avatar" class="w-full h-full rounded-full border-2 border-red-500" />
+                                    </div>
+                                    <p class="font-bold">${room.name}</p>
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <p> {{$room->description}}</p>
+                            </div>
+                        </a>`;
+                const joinedRoomsList = document.getElementById("joined_rooms_list");
+                // append to end of list
+                if (joinedRoomsList) joinedRoomsList.innerHTML +=html;
+                // Remove this room out of search result list
+                const searchRoomResultElement = document.getElementById("search-room-result-"+room.id);
+                if (searchRoomResultElement) searchRoomResultElement.remove();
+
+            },
+            error: function(error) {
+                turnOnNotification(error.message, "error");
+            }
+        });
+    }
 </script>

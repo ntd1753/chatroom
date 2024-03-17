@@ -26,8 +26,12 @@ class Room extends Model
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
 
-    public function users(): \Illuminate\Database\Eloquent\Relations\MorphMany
+//    public function users(): \Illuminate\Database\Eloquent\Relations\MorphMany
+//    {
+//        return $this->morphMany(User::class, 'roomAble');
+//    }
+    public function user()
     {
-        return $this->morphMany(User::class, 'roomAble');
+        return $this->belongsToMany(User::class,'room_user','room_id','user_id');
     }
 }
