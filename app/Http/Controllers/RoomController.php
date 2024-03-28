@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\RoomUser;
 use App\Models\User;
-use http\Message;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
@@ -67,23 +67,6 @@ class RoomController extends Controller
         }
         return response()->json($rooms, 200);
     }
-    function sendmess(Request $request){
-        $input = $request->all();
-//        $mess = \App\Models\Message::create([
-//            'content' => $input['mess'],
-//            'user_id' => Auth::user()->id,
-//            'room_id' => 1,
-//        ]);
-        $mess = new \App\Models\Message();
-        $mess["content"] = $input['mess'];
-        $mess['user_id'] = Auth::user()->id;
-        $mess['room_id']= 1;
-
-        $mess->save();
-        //return response()->json($mess, 200);
-
-        //return view('content.chatRoom');
-    }
     public function join(Request $request): JsonResponse
     {
         $input = $request->all();
@@ -137,6 +120,22 @@ class RoomController extends Controller
         } else $room = $roomAble;
 
         return response()->json($room, 200);
-
     }
+    public  function showRoom($id){
+        $messages = Room::where('id', '=', $id)->get()[0]->message;
+        $room=Room::find($id);
+        return view('content.showChat', ['message' => $messages, 'room' => $room]);
+    }
+    function sendMess(Request $request){
+        $input = $request->all();
+
+        $mess =Message::create([
+            'chatRoomId' => $input['chatRoomId'],
+            'content' => $input['content'],
+            'type' => $input['type'],
+            'userId' => Auth::user()->id,
+        ]);
+        return response()->json($mess, 200);
+    }
+
 }
