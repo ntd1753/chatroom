@@ -29,7 +29,7 @@ Route::group(['prefix' => 'chat-room'], function () {
 });
 
 Route::get('/info',[RoomController::class, 'roomInfo'])->name('room.info');
-Route::get('chat-room/room/{id}',[RoomController::class,"showRoom"]);
+Route::get('chat-room/room/{id}',[RoomController::class,"showRoom"])->name('room.show');
 
 
 

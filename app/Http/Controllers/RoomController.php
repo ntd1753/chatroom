@@ -124,7 +124,9 @@ class RoomController extends Controller
     public  function showRoom($id){
         $messages = Room::where('id', '=', $id)->get()[0]->message;
         $room=Room::find($id);
-        return view('content.showChat', ['message' => $messages, 'room' => $room]);
+        $roomUser=Room::where('id', '=', $id)->get()[0];
+        $user=$roomUser->user->push($roomUser->owner);
+        return view('content.showChat', ['message' => $messages, 'room' => $room, 'user' => $user]);
     }
     function sendMess(Request $request){
         $input = $request->all();

@@ -77,6 +77,8 @@
                         user: item.user,
                     };
                     listRoom.push(roomData);
+                    let roomUrlTemplate="{{ route('room.show', ['id' => 'ROOM_ID_PLACEHOLDER']) }}"
+                    let roomUrl = roomUrlTemplate.replace('ROOM_ID_PLACEHOLDER', item.id);
                     let html='';
                     html +=`
                     <div class="col-span-1 w-full h-full bg-[#212540] items-center hidden room_info_{{\Illuminate\Support\Facades\Auth::user()->id}}" id="room_${item.id}">
@@ -90,13 +92,16 @@
                         <p class="font-bold text-lg	text-white">${item.name}</p>
                                         <p class=" text-xs	text-white">${item.user.length +1} thành viên</p>
                                     </div>
+
                                     <div class="absolute top-0 right-0 text-sm mr-2 mt-1  flex justify-end items-center gap-4 ">
+                                        <a href="${roomUrl}">
                                         <div class="hover:text-red-500 text-white">
                                             <i class="fa-solid fa-comment-dots fa-2xl"></i>
-                                        </div>
+                                        </div></a>
+                                        <a href="#">
                                         <div class="items-center gap-4 py-2 hover:text-red-500 text-white">
                                             <i class="fa-solid fa-right-from-bracket fa-2xl" ></i>
-                                        </div>
+                                        </div></a>
                                     </div>
                                 </div>
                             </div>
