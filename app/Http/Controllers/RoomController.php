@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Models\Room;
 use App\Models\RoomUser;
 use App\Models\User;
@@ -137,6 +138,7 @@ class RoomController extends Controller
             'type' => $input['type'],
             'userId' => Auth::user()->id,
         ]);
+        event(new MessageSent($request->all(),$input['chatRoomId']));
         return response()->json($mess, 200);
     }
 

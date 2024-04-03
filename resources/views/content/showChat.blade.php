@@ -118,11 +118,55 @@
         </div>
     </div>
     <script src="https://unpkg.com/flowbite@1.4.0/dist/flowbite.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
 
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('3c0d0b48b67a1ded1766', {
+            cluster: 'ap1'
+        });
+
+        var channel = pusher.subscribe(`channel-{{$room->id}}`);
+        document.addEventListener('DOMContentLoaded', function() {
+            channel.bind('my-event', function(data) {
+                console.log(data);
+                if({{Auth::user()->id}}!=data.message.userId) {
+                    listMessage.scrollTo(0,  listMessage.scrollHeight);
+
+                    const html = `
+                    <di <div class="flex flex-row justify-start">
+                           <div class="w-8 h-8 relative flex flex-shrink-0 mr-4">
+                               <img class="shadow-md rounded-full w-full h-full object-cover" src="https://randomuser.me/api/portraits/women/33.jpg" alt="">
+                           </div>
+                           <div class="messages text-sm text-gray-700 grid grid-flow-row gap-2">
+                               <div class="flex items-center group">
+                                   <p class="px-6 py-3 rounded-t-full rounded-r-full bg-gray-800 max-w-xs lg:max-w-md text-gray-200">
+                                       ${data.message.content}</p>
+                                   <button type="button" class="hidden group-hover:block flex flex-shrink-0 focus:outline-none mx-2 block rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-700 bg-gray-800 w-8 h-8 p-2">
+                                       <svg viewBox="0 0 20 20" class="w-full h-full fill-current">
+                                           <path d="M10.001,7.8C8.786,7.8,7.8,8.785,7.8,10s0.986,2.2,2.201,2.2S12.2,11.215,12.2,10S11.216,7.8,10.001,7.8z
+                                                    M3.001,7.8C1.786,7.8,0.8,8.785,0.8,10s0.986,2.2,2.201,2.2S5.2,11.214,5.2,10S4.216,7.8,3.001,7.8z M17.001,7.8
+                                                    C15.786,7.8,14.8,8.785,14.8,10s0.986,2.2,2.201,2.2S19.2,11.215,19.2,10S18.216,7.8,17.001,7.8z"></path>
+                                       </svg>
+                                   </button>
+                               </div>
+                           </div>
+                       </div>`;
+                    const listMessage = document.getElementById('list-message');
+                    if (listMessage) listMessage.innerHTML += html;
+                }
+            });
+        })
+
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         function sendMessage(roomId){
             let content = document.getElementById("message_content").value;
+
             $.ajax({
                 type: 'POST',
                 url: '{{ route("sendmess") }}',
@@ -131,8 +175,10 @@
                     chatRoomId: roomId,
                     content:content,
                     type: "text",
+                    userId:{{Auth::user()->id}}
                 },
                 success: function(response) {
+                    console.log(response);
                     const html =`
                     <div class="flex flex-row justify-end">
                        <div class="messages text-sm text-white grid grid-flow-row gap-2">
@@ -150,6 +196,8 @@
                    </div>`;
                     const listMessage = document.getElementById('list-message');
                     if(listMessage) listMessage.innerHTML +=html;
+                    document.getElementById("message_content").value="";
+                    listMessage.scrollTo(0,  listMessage.scrollHeight);
                 },
                 error: function(error) {
 
@@ -159,6 +207,7 @@
         }
         const userData = @json($user);
         document.addEventListener('DOMContentLoaded', function() {
+            listMessage.scrollTo(0,  listMessage.scrollHeight);
             const input = document.getElementById('message_content');
             const resultBox = document.getElementById('tag-user-box');
             //document.body.appendChild(resultBox);
