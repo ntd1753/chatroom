@@ -25,5 +25,42 @@
             notificationElement.classList.add('hidden');
         }, 3000);
     }
+    $(document).ready(function() {
+
+        $.ajax({
+            type: 'GET',
+            url: '{{ route("room.messageNotify") }}',
+            data: $('#searchRoomForm').serialize(),
+            success: function(response) {
+                console.log(response);
+                let html ='';
+                response.forEach((item) =>{
+                    const senderName = item.sender.name;
+                    // Để lấy tên phòng từ chuỗi JSON trong 'data'
+                    const notificationData = JSON.parse(item.data);
+                    const roomName = notificationData.roomName;
+                    html+=`
+                                <div class="bg-white rounded-lg border-gray-200 border p-3 shadow-lg mt-4">
+                                    <div class="flex justify-between items-center">
+                                      <span class="text-gray-800 text-sm font-semibold">New Message</span>
+                                      <span class="text-gray-400 text-xs">2 mins ago</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mt-1">
+                                      Bạn có một tin nhắn mới từ ${senderName} trong phòng ${roomName}
+                                    </p>
+                                </div>`
+                });
+                $('#list-notification-message').append(html);
+                //var unreadCount = notifications.filter(notification => notification.pivot.read_at === null).length;
+
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+
+
+    });
+
 </script>
 

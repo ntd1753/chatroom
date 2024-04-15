@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
+use App\Models\Notification;
 use App\Models\Room;
 use App\Models\RoomUser;
 use App\Models\User;
 use App\Models\Message;
+use App\Models\UserQueue;
+use App\Notifications\MessageNontification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Support\Facades\Storage;
 class RoomController extends Controller
 {
     public function __construct()
@@ -73,9 +76,14 @@ class RoomController extends Controller
         $input = $request->all();
         $user = Auth::user();
         $room = Room::find($input['room_id']);
-        if($user && $room){
-            $room->user()->attach($user->id);
-        }
+        $queue = new UserQueue();
+        $queue->roomId=$input['room_id'];
+        $queue->userId=$user->id;
+        $queue->status='0';
+        $queue->save();
+//        if($user && $room){
+//            $room->user()->attach($user->id);
+//        }
         $message = "You have joined the room";
 
         return response()->json(["message" => $message, "room" => $room], 200);
@@ -111,7 +119,7 @@ class RoomController extends Controller
                 }),
             ];
         });
-        $roomAble = $roomAble;
+
         //dd($roomAble);
         //exit();
         if(!empty($room)){
@@ -122,24 +130,10 @@ class RoomController extends Controller
 
         return response()->json($room, 200);
     }
-    public  function showRoom($id){
-        $messages = Room::where('id', '=', $id)->get()[0]->message;
-        $room=Room::find($id);
-        $roomUser=Room::where('id', '=', $id)->get()[0];
-        $user=$roomUser->user->push($roomUser->owner);
-        return view('content.showChat', ['message' => $messages, 'room' => $room, 'user' => $user]);
-    }
-    function sendMess(Request $request){
-        $input = $request->all();
-
-        $mess =Message::create([
-            'chatRoomId' => $input['chatRoomId'],
-            'content' => $input['content'],
-            'type' => $input['type'],
-            'userId' => Auth::user()->id,
-        ]);
-        event(new MessageSent($request->all(),$input['chatRoomId']));
-        return response()->json($mess, 200);
+    public function getMessageNontify() {
+        $user = Auth::user();
+        $notifications = $user->notifications()->wherePivot('read_at', null)->with('sender')->get();
+        return response()->json($notifications, 200);
     }
 
 }

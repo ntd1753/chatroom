@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('userqueue', function (Blueprint $table) {
             $table->id();
-            $table->text("content");
-            $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("room_id");
+            $table->unsignedBigInteger('roomId');
+            $table->unsignedBigInteger('userId');
+            $table->unsignedBigInteger('ownerId');
+            $table->enum('status', ['0', '1']);
+
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('userqueue');
     }
 };

@@ -55,5 +55,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Room::class,'room_user','user_id','room_id');
     }
-
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_user')
+            ->withPivot('read_at')  // Thêm trường read_at từ bảng trung gian
+            ->withTimestamps();     // Đảm bảo Laravel quản lý timestamps trong bảng trung gian
+    }
 }

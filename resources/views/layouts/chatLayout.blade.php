@@ -6,8 +6,9 @@
     @include('partials.sidebar')
     <div  class="col-span-5 w-full h-full bg-[#3c425e]">
         @yield('content')
-
+        @include('components.modals.notificationModal')
     </div>
+
 </div>
 
 <!-- add New Room Form Modal -->

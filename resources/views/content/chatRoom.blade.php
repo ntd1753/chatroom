@@ -48,7 +48,6 @@
 
         </div>
 
-
     </div>
     @include('components.modals.roomFormModal')
     @include('components.modals.searchRoomModal')
@@ -112,7 +111,7 @@
                                     <div class="absolute right-0 top-0"><i class="fa-solid fa-magnifying-glass" ></i></div>
                             </div>
                         </div>
-
+                        <div class="w-full" id="list_user_room_${item.id}">
                     `;
 
                     item.user.forEach((element)=>{
@@ -131,7 +130,7 @@
                         </div>
                     `;
                     });
-                    let htmlEnd =`</div>`;
+                    let htmlEnd =`  </div></div>`;
                     html= html +htmlEnd;
                     //console.log(html);
                     $('#chat_content').append(html);
@@ -208,17 +207,79 @@
         }
         function searchUserInRoom(roomId){
             let input = document.getElementById('search_input_room_'+roomId).value;
+            let html='';
             for (let i = 0; i < listRoom.length; i++) {
                 if (listRoom[i].id === roomId) {
                     listRoom[i].user.forEach((item) =>{
                         if(item.name.indexOf(input) !== -1){
                             console.log(item.name);
+                             html +=`
+                            <div class="w-8/9 bg-blue-300-400 max-h-screen overflow-auto px-2 py-1 bg-[#212540]" id="room_${roomId}_user_${item.id}">
+                            <div href="#" class="w-full bg-[#262948] hover:bg-[#4289f3] py-3 px-4 my-4 rounded-lg grid grid-cols-3 gap-2 relative">
+                                <div class="col-span-1">
+                                    <div class="flex justify-start items-center gap-4">
+                                        <div class="w-8 h-8 rounded-full">
+                                            @include('components.avatar', ['avatar_path' => $room->icon ?? 'images/avatar.jpg'])
+                            </div>
+                            <p class="font-bold text-lg text-white">${item.name}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
                         }
                     })
 
-                    break; // Kết thúc vòng lặp khi tìm thấy phòng mong muốn
+
+
+                    break;
                 }
             }
+            html += "</div>";
+            document.getElementById(`list_user_room_${roomId}`).innerHTML = html;
+
+
         }
     </script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
+    <script>
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+        var pusher = new Pusher('3c0d0b48b67a1ded1766', {
+            cluster: 'ap1'
+        });
+
+            var channel = pusher.subscribe(`my-channel`);
+            document.addEventListener('DOMContentLoaded', function() {
+                channel.bind('my-event', function(data) {
+                    console.log(data);
+                    let html ='';
+                    data.forEach((item) =>{
+                        const senderName = item.authorName;
+                        // Để lấy tên phòng từ chuỗi JSON trong 'data'
+
+                        const roomName = item.roomName;
+                        html+=`
+                                <div class="bg-white rounded-lg border-gray-200 border p-3 shadow-lg mt-4">
+                                    <div class="flex justify-between items-center">
+                                      <span class="text-gray-800 text-sm font-semibold">New Message</span>
+                                      <span class="text-gray-400 text-xs">2 mins ago</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mt-1">
+                                      Bạn có một tin nhắn mới từ ${senderName} trong phòng ${roomName}
+                                    </p>
+                                </div>`
+                    });
+                    $('#list-notification-message').append(html);
+                });
+
+        })
+
+
+
+    </script>
+
 @endsection

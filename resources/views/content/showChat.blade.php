@@ -9,8 +9,9 @@
         }
     </style>
     <div id="chat_content" class="h-screen relative">
+        <input type="file" id="upload-image" class="hidden" name="image" accept="image/*" onchange="sendImage()">
         <div id="room-title" class="w-full">
-            <div class="w-full bg-[#262948] hover:bg-[#4289f3] min-h-35	relative">
+            <div class="w-full bg-[#262948] hover:bg-[#4289f3] min-h-25	relative">
                 <div class="col-span-1">
                     <div class="flex justify-start items-center gap-4 px-5 py-5">
                         <div class="w-12 h-12 rounded-full">
@@ -53,7 +54,7 @@
                        </div>
                     @else
                        <div class="h-min-10 bg-blue-300 max-w-40 rounded-lg ">
-                           <img  class="rounded-lg " src="{!! $item->content !!}">
+                           <img  class="rounded-lg " src="{{asset($item->content)}}">
                        </div>
                     @endif
                @else
@@ -68,8 +69,8 @@
                    @else
                        <div class="flex flex-row justify-start">
                            <div class="w-8 h-8 relative flex flex-shrink-0 mr-4">
-                               <img class="shadow-md rounded-full w-full h-full object-cover"
-                                    src="{!! $item->content !!}"
+                               <img class="rounded-lg"
+                                    src="{{asset($item->content)}}"
                                     alt=""
                                />
                            </div>
@@ -89,14 +90,16 @@
             @endforeach
                 <div class="absolute none bottom-0 bg-white overflow-y-scroll min-w-20" id="tag-user-box"></div>
        </div>
-        <div class="relative">
+
             <div class="h-1/12 chat-footer flex-none bg-[#212540]">
                 <div class="flex flex-row items-center p-4">
-                    <button type="button" class="flex flex-shrink-0 focus:outline-none mx-2 block text-blue-600 hover:text-blue-700 w-6 h-6">
+                    <button type="button" id="button-up-image" class="flex flex-shrink-0 focus:outline-none mx-2 block text-blue-600 hover:text-blue-700 w-6 h-6">
                         <svg viewBox="0 0 20 20" class="w-full h-full fill-current">
                             <path d="M11,13 L8,10 L2,16 L11,16 L18,16 L13,11 L11,13 Z M0,3.99406028 C0,2.8927712 0.898212381,2 1.99079514,2 L18.0092049,2 C19.1086907,2 20,2.89451376 20,3.99406028 L20,16.0059397 C20,17.1072288 19.1017876,18 18.0092049,18 L1.99079514,18 C0.891309342,18 0,17.1054862 0,16.0059397 L0,3.99406028 Z M15,9 C16.1045695,9 17,8.1045695 17,7 C17,5.8954305 16.1045695,5 15,5 C13.8954305,5 13,5.8954305 13,7 C13,8.1045695 13.8954305,9 15,9 Z" />
                         </svg>
                     </button>
+
+
                     <div class="relative flex-grow w-full">
                         <label>
                             <input id="message_content"
@@ -115,11 +118,12 @@
                     </button>
                 </div>
             </div>
-        </div>
+
     </div>
     <script src="https://unpkg.com/flowbite@1.4.0/dist/flowbite.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
+        const listMessage = document.getElementById('list-message');
 
         // Enable pusher logging - don't include this in production
         Pusher.logToConsole = true;
@@ -130,6 +134,8 @@
 
         var channel = pusher.subscribe(`channel-{{$room->id}}`);
         document.addEventListener('DOMContentLoaded', function() {
+            listMessage.scrollTo(0,  listMessage.scrollHeight);
+
             channel.bind('my-event', function(data) {
                 console.log(data);
                 if({{Auth::user()->id}}!=data.message.userId) {
@@ -154,7 +160,6 @@
                                </div>
                            </div>
                        </div>`;
-                    const listMessage = document.getElementById('list-message');
                     if (listMessage) listMessage.innerHTML += html;
                 }
             });
@@ -162,7 +167,6 @@
 
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         function sendMessage(roomId){
             let content = document.getElementById("message_content").value;
@@ -207,7 +211,7 @@
         }
         const userData = @json($user);
         document.addEventListener('DOMContentLoaded', function() {
-            listMessage.scrollTo(0,  listMessage.scrollHeight);
+            //listMessage.scrollTo(0,  listMessage.scrollHeight);
             const input = document.getElementById('message_content');
             const resultBox = document.getElementById('tag-user-box');
             //document.body.appendChild(resultBox);
@@ -272,4 +276,43 @@
         });
 
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#button-up-image').click(function(){
+                $('#upload-image').click();
+            });
+        });
+
+         function sendImage() {
+             //console.log($('#upload-image').val());
+            const file_data = $('#upload-image').prop('files')[0]; // Lấy file được chọn
+             const chatRoomId ={{$room->id}};
+             const form_data = new FormData();
+             form_data.append('image', file_data); // Thêm file vào form data
+             form_data.append('_token',$('meta[name="csrf-token"]').attr('content')); // Thêm CSRF token để xác minh
+             form_data.append('chatRoomId', chatRoomId);
+             console.log(form_data)
+
+             $.ajax({
+                 url: '{{route('room.uploadImage')}}', // URL xử lý file trên server
+                 type: 'POST',
+                 data: form_data,
+                 processData: false, // Không xử lý data
+                 contentType: false, // Không đặt contentType mặc định
+                 success: function (response) {
+                     console.log(response);
+                    // alert('Ảnh đã được tải lên thành công!');
+                 },
+                 error: function (response) {
+                     console.error(response);
+                     alert('Có lỗi xảy ra khi tải ảnh lên!');
+                 }
+             });
+         }
+    </script>
+
+
+
+
 @endsection

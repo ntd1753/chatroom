@@ -15,22 +15,22 @@
     </div>
     <div class="w-full py-4 px-6 text-white font-semibold">
         <div class="flex justify-between items-center py-2">
-            <a class="flex justify-start items-center gap-4 hover:text-red-500" href="#">
+            <a class="flex justify-start items-center gap-4 hover:text-red-500" href="{{route('dashboard')}}">
                 <i class="fa-solid fa-house"></i>
                 <p>Dashboard</p>
             </a>
         </div>
         <div class="flex justify-between items-center py-2">
-            <a class="flex justify-start items-center gap-4 hover:text-red-500" href="#" >
+            <a class="flex justify-start items-center gap-4 hover:text-red-500" href="{{route('room.index')}}" >
                 <i class="fa-solid fa-users"></i>
                 <p>Chat Room</p>
             </a>
             @include('components.countNotification', ['number' => 1])
         </div>
-        <div class="flex justify-between items-center py-2">
-            <a class="flex justify-start items-center gap-4 hover:text-red-500" href="#">
-                <i class="fa-solid fa-calendar-days"></i>
-                <p>Calendar</p>
+        <div class="flex justify-between items-center py-2" >
+            <a class="flex justify-start items-center gap-4 hover:text-red-500" onclick="openModal('notificationModal')" href="#">
+                <i class="fa-solid fa-bell"></i>
+                <p>Notification</p>
             </a>
             @include('components.countNotification', ['number' => 1])
         </div>
@@ -46,6 +46,7 @@
             <p> Logout</p>
         </a>
 
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf
         </form>
