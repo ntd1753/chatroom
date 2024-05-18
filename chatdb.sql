@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table chat.migrations: ~11 rows (approximately)
+-- Dumping data for table chat.migrations: ~12 rows (approximately)
 REPLACE INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(1, '2014_10_12_000000_create_users_table', 1),
 	(2, '2014_10_12_100000_create_password_reset_tokens_table', 1),
@@ -82,7 +82,8 @@ REPLACE INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(10, '2024_04_10_075059_create_userqueue_table', 6),
 	(11, '2024_01_31_130432_create_roomables_table', 7),
 	(12, '2024_04_10_050018_create_notifications_table', 7),
-	(13, '2024_04_15_082046_create_notification_user_table', 7);
+	(13, '2024_04_15_082046_create_notification_user_table', 7),
+	(14, '2024_05_18_124633_add_provider_fields_to_users_table', 8);
 
 -- Dumping structure for table chat.notifications
 CREATE TABLE IF NOT EXISTS `notifications` (
@@ -264,15 +265,18 @@ CREATE TABLE IF NOT EXISTS `users` (
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_email_unique` (`email`)
+  UNIQUE KEY `users_email_unique` (`email`),
+  UNIQUE KEY `users_provider_id_unique` (`provider_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table chat.users: ~3 rows (approximately)
-REPLACE INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-	(2, 'nguyen dat', 'nguyendat8b2k3@gmail.com', NULL, '$2y$12$3JIp0wz0tuiGy3bp5x1dGuH55wvPgB7bplrLvgheNARNknPkUPmrS', 'rl2yns6rZjYsmDVdFkHxitOLZxKojO7h2Tuf4SzaTkk0f9Dy4ocfpLHtBpyE', '2024-02-26 09:29:40', '2024-02-26 09:29:40'),
-	(3, '7576874', 'ntd1753@gmail.com', NULL, '$2y$12$DJyCwRMuke9cTmeDT2JBteE8GfFrWF6bSon4GfERoWdVoFNAsBU0q', 'DSH1wYu32u7dhtYfyX14JlEl3n0rgpMV4b4t0KrGH5EPkH5EEzFpAjxOsbdJ', '2024-02-26 09:33:31', '2024-02-26 09:33:31'),
-	(4, 'Nguyễn Thành Đạt', 'Dat.NT215027@sis.hust.edu.vn', NULL, '$2y$12$pUYW.TXmiEbfuq5hqb7kouDz2R.NrT9brEXTlrN3r81fvhCHFqLl2', NULL, '2024-02-26 09:33:56', '2024-02-26 09:33:56');
+REPLACE INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `provider`, `provider_id`) VALUES
+	(2, 'nguyen dat', 'nguyendat8b2k3@gmail.com', NULL, '$2y$12$3JIp0wz0tuiGy3bp5x1dGuH55wvPgB7bplrLvgheNARNknPkUPmrS', 'rl2yns6rZjYsmDVdFkHxitOLZxKojO7h2Tuf4SzaTkk0f9Dy4ocfpLHtBpyE', '2024-02-26 09:29:40', '2024-02-26 09:29:40', NULL, NULL),
+	(3, '7576874', 'ntd1753@gmail.com', NULL, '$2y$12$DJyCwRMuke9cTmeDT2JBteE8GfFrWF6bSon4GfERoWdVoFNAsBU0q', 'BjHyy8fP8UpcosSKvINn0J1KDNQLiwhlil6zpC9hwypfrJuUwAPFtStkNYZT', '2024-02-26 09:33:31', '2024-02-26 09:33:31', NULL, NULL),
+	(4, 'Nguyễn Thành Đạt', 'Dat.NT215027@sis.hust.edu.vn', NULL, '$2y$12$pUYW.TXmiEbfuq5hqb7kouDz2R.NrT9brEXTlrN3r81fvhCHFqLl2', NULL, '2024-02-26 09:33:56', '2024-02-26 09:33:56', NULL, NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
