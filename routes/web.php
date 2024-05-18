@@ -15,14 +15,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
+Route::get('/auth/google', [\App\Http\Controllers\Auth\LoginController::class,'redirectToProvider']);
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\LoginController::class,'handleProviderCallback']);
+
 Auth::routes();
 
+Route::get('/home', [RoomController::class, 'index'])->name('room.index');
 
 Route::group(['prefix' => 'chat-room'], function () {
-
-    Route::get('/', [RoomController::class, 'index'])->name('room.index');
     Route::get('/notify',[RoomController::class,'getMessageNontify'])->name('room.messageNotify');
     Route::post('/create-room', [RoomController::class, 'storeRoom'])->name('room.store');
     Route::post('/search/', [RoomController::class, 'search'])->name('room.search');
@@ -33,6 +35,5 @@ Route::group(['prefix' => 'chat-room'], function () {
 });
 Route::get('/dashboard',[\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 Route::post('/dashboard/approve-user',[\App\Http\Controllers\DashboardController::class, 'approveUser'])->name('approveUser');
-
 Route::get('/info',[RoomController::class, 'roomInfo'])->name('room.info');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
